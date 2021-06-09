@@ -21,17 +21,18 @@ public class IndianCensusAnalyzer
             csvToBeanBuilder.withIgnoreLeadingWhiteSpace(true);
             CsvToBean<IndianCensusCSV> csvToBean=csvToBeanBuilder.build();
             Iterator<IndianCensusCSV> censusCSVIterator=csvToBean.iterator();
-            while(censusCSVIterator.hasNext())
-            {
-                numOfEntries++;
-                IndianCensusCSV censusData=censusCSVIterator.next();
-            }
+            Iterable<IndianCensusCSV> csvIterable= ()->censusCSVIterator;
+            numOfEntries= StreamSupport.stream(csvIterable.spliterator() ,false).count();
             return numOfEntries;
-
         }
         catch (IOException e)
         {
             throw new CustomeException(e.getMessage(),CustomeException.ExceptionType.CENSUS_FILE_PROBLEM);
+        }
+        catch(IllegalStateException e)
+        {
+            throw new CustomeException(e.getMessage(),CustomeException.ExceptionType.UNABLE_TO_PARSE);
+
         }
 
     }
